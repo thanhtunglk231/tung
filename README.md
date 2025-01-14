@@ -34,3 +34,4 @@ Copy code
   renderItem={({ item }) => <Text>{item}</Text>}
   renderSectionHeader={({ section }) => <Text>{section.title}</Text>}
 />
+![Ảnh bài tập](IMG_0244.PNG)
