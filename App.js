@@ -28,7 +28,7 @@ const App = () => {
           <View style={styles.tieuDeNhom}>
             <Text style={styles.tenNhom}>{title}</Text>
           </View>
-        )} // Hiển thị tiêu đề nhóm
+        )} // Hiển thị tiêu đề \
       />
     </View>
   );
