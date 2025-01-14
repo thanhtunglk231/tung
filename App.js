@@ -16,7 +16,7 @@ const App = () => {
     { title: 'Danh mục C', data: ['Sản phẩm C1', 'Sản phẩm C2', 'Sản phẩm C3'] },
   ];
 
-  // Hàm xử lý khi bấm vào sản phẩm
+  // Hàm xử lý khi
   const handlePress = (name) => {
     Alert.alert('Thông báo', `Bạn đã chọn ${name}`);
   };
