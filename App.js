@@ -1,95 +1,84 @@
-import React from 'react';
-import { FlatList, SectionList, Text, View, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 
-const App = () => {
-  // Danh sách sản phẩm cho FlatList
-  const products = [
-    { id: '1', name: 'Product A', price: '10.00' },
-    { id: '2', name: 'Product B', price: '15.00' },
-    { id: '3', name: 'Product C', price: '20.00' },
-  ];
+const PhoneLogin = () => {
+  const [phone, setPhone] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Danh sách nhóm sản phẩm cho SectionList
-  const groupedProducts = [
-    { title: 'Danh mục A', data: ['Sản phẩm A1', 'Sản phẩm A2', 'Sản phẩm A3'] },
-    { title: 'Danh mục B', data: ['Sản phẩm B1', 'Sản phẩm B2'] },
-    { title: 'Danh mục C', data: ['Sản phẩm C1', 'Sản phẩm C2', 'Sản phẩm C3'] },
-  ];
-
-  // Hàm xử lý khi
-  const handlePress = (name) => {
-    Alert.alert('Thông báo', `Bạn đã chọn ${name}`);
+  const handlePhoneChange = (text) => {
+    setPhone(text);
+    const phoneRegex = /^(\+84|0)[3-9][0-9]{8}$/;
+    if (phoneRegex.test(text)) {
+      setError("");
+      setSuccess("Số điện thoại hợp lệ");
+    } else {
+      setSuccess("");
+      setError("Số điện thoại không đúng định dạng. Vui lòng nhập lại");
+    }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>Danh sách sản phẩm (FlatList)</Text>
-      <FlatList
-        data={products}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => handlePress(item.name)}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.price}>{item.price} USD</Text>
-          </TouchableOpacity>
-        )}
+    <View style={styles.container}>
+      <Text style={styles.title}>Đăng nhập</Text>
+      <Text style={styles.label}>Nhập số điện thoại</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="phone-pad"
+        placeholder="Nhập số điện thoại"
+        value={phone}
+        onChangeText={handlePhoneChange}
       />
-
-      <Text style={styles.header}>Danh sách nhóm sản phẩm (SectionList)</Text>
-      <SectionList
-        sections={groupedProducts}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => handlePress(item)}>
-            <Text style={styles.name}>{item}</Text>
-          </TouchableOpacity>
-        )}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.sectionHeader}>
-            <Text style={styles.title}>{title}</Text>
-          </View>
-        )}
-      />
-    </ScrollView>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {success ? <Text style={styles.success}>{success}</Text> : null}
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Tiếp tục</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
-    backgroundColor: '#f8f8f8',
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginVertical: 10,
-    textAlign: 'center',
-  },
-  sectionHeader: {
-    backgroundColor: '#007BFF',
-    padding: 10,
-    marginBottom: 5,
+    padding: 20,
+    justifyContent: "center",
   },
   title: {
-    fontSize: 18,
-    color: '#fff',
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
   },
-  item: {
-    padding: 15,
-    marginBottom: 5,
-    backgroundColor: '#fff',
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "gray",
+    padding: 10,
     borderRadius: 5,
-    elevation: 3,
+    marginBottom: 10,
   },
-  name: {
-    fontSize: 18,
-    color: '#333',
+  error: {
+    color: "red",
+    marginBottom: 10,
   },
-  price: {
-    fontSize: 14,
-    color: '#888',
+  success: {
+    color: "green",
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "blue",
+    padding: 15,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
   },
 });
 
-export default App;
+export default PhoneLogin;
