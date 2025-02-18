@@ -17,6 +17,7 @@ const PhoneLogin = () => {
       setError("Số điện thoại không đúng định dạng. Vui lòng nhập lại");
     }
   };
+  //hello
 
   return (
     <View style={styles.container}>
