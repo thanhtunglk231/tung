@@ -1,85 +1,20 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import PhoneLogin from "./screens/PhoneLogin";
+import HomeScreen from "./screens/HomeScreen";
 
-const PhoneLogin = () => {
-  const [phone, setPhone] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+const Stack = createStackNavigator();
 
-  const handlePhoneChange = (text) => {
-    setPhone(text);
-    const phoneRegex = /^(\+84|0)[3-9][0-9]{8}$/;
-    if (phoneRegex.test(text)) {
-      setError("");
-      setSuccess("Số điện thoại hợp lệ");
-    } else {
-      setSuccess("");
-      setError("Số điện thoại không đúng định dạng. Vui lòng nhập lại");
-    }
-  };
-  //hello
-
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Đăng nhập</Text>
-      <Text style={styles.label}>Nhập số điện thoại</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="phone-pad"
-        placeholder="Nhập số điện thoại"
-        value={phone}
-        onChangeText={handlePhoneChange}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      {success ? <Text style={styles.success}>{success}</Text> : null}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Tiếp tục</Text>
-      </TouchableOpacity>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="PhoneLogin" component={PhoneLogin} options={{ title: "Đăng nhập" }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: "Trang chủ" }} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  error: {
-    color: "red",
-    marginBottom: 10,
-  },
-  success: {
-    color: "green",
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "blue",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
-});
-
-export default PhoneLogin;
+export default App;
