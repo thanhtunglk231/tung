@@ -1,238 +1,333 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, StyleSheet, TextInput, FlatList, 
-  Image, TouchableOpacity, Dimensions 
+import React from 'react';
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Dimensions,
 } from 'react-native';
-import * as Location from 'expo-location';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-// Kích thước màn hình
 const { width } = Dimensions.get('window');
-const CATEGORY_WIDTH = (width - 32) / 4;
 
-// Danh mục món ăn
-const categories = [
-  { id: '1', name: 'Pizza', icon: 'pizza-outline' },
-  { id: '2', name: 'Burger', icon: 'fast-food-outline' },
-  { id: '3', name: 'Drink', icon: 'beer-outline' },
-  { id: '4', name: 'Rice', icon: 'restaurant-outline' },
+const defaultImage = require('../assets/burger.png'); // ✅ đúng
+
+
+
+const products = [
+  { id: '1', name: 'Organic Bananas', price: '$4.99', image: defaultImage },
+  { id: '2', name: 'Red Apple', price: '$4.99', image: defaultImage },
 ];
 
-// Món ăn phổ biến
-const popularItems = [
-  {
-    id: '1',
-    name: 'Burger',
-    price: '$18',
-    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '2',
-    name: 'Pizza',
-    price: '$20',
-    image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=500&q=60',
-  },
+const groceriesCategories = [
+  { id: '1', name: 'Pulses', image: defaultImage },
+  { id: '2', name: 'Rice', image: defaultImage },
+  { id: '3', name: 'Vegetables', image: defaultImage },
+  { id: '4', name: 'Fruits', image: defaultImage },
 ];
 
-const HomeScreen = () => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [address, setAddress] = useState('Fetching location...');
-  const [errorMsg, setErrorMsg] = useState(null);
+const groceriesProducts = [
+  { id: '1', name: 'Beef Bone', weight: '1kg, Price', price: '$4.99', image: defaultImage },
+  { id: '2', name: 'Broiler Chicken', weight: '1kg, Price', price: '$4.99', image: defaultImage },
+  { id: '3', name: 'Fresh Tomato', weight: '1kg, Price', price: '$3.99', image: defaultImage },
+  { id: '4', name: 'Green Chili', weight: '500g, Price', price: '$2.49', image: defaultImage },
+];
 
-  // Lấy địa chỉ cụ thể từ GPS
-  useEffect(() => {
-    const getLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission denied');
-        return;
-      }
+const bannerImages = [
+  { id: '1', title: 'Fresh Vegetables', subtitle: 'Get Up To 40% OFF', image: defaultImage },
+  { id: '2', title: 'Fresh Fruits', subtitle: 'Get Up To 30% OFF', image: defaultImage },
+];
 
-      let currentLocation = await Location.getCurrentPositionAsync({});
-      let geocode = await Location.reverseGeocodeAsync(currentLocation.coords);
+const HomeScreen = ({ navigation }) => {
+  const renderProduct = ({ item }) => (
+    <TouchableOpacity
+      style={styles.productCard}
+      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+    >
+      <Image source={item.image} style={styles.productImage} />
+      <Text style={styles.productName}>{item.name}</Text>
+      <Text style={styles.productPrice}>{item.price}</Text>
+      <TouchableOpacity style={styles.addButton}>
+        <Icon name="add" size={20} color="white" />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
 
-      if (geocode.length > 0) {
-        let { district, city, region, country } = geocode[0];
-        setAddress(`${district || ''}, ${city || ''}, ${region || ''}, ${country || ''}`);
-      } else {
-        setAddress('Không tìm thấy địa chỉ');
-      }
-    };
+  const renderGroceriesCategory = ({ item }) => (
+    <View style={styles.groceriesCategoryCard}>
+      <Image source={item.image} style={styles.groceriesCategoryImage} />
+      <Text style={styles.groceriesCategoryName}>{item.name}</Text>
+    </View>
+  );
 
-    getLocation();
-  }, []);
+  const renderGroceriesProduct = ({ item }) => (
+    <TouchableOpacity
+      style={styles.groceriesProductCard}
+      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+    >
+      <Image source={item.image} style={styles.groceriesProductImage} />
+      <Text style={styles.groceriesProductName}>{item.name}</Text>
+      <Text style={styles.groceriesProductWeight}>{item.weight}</Text>
+      <View style={styles.groceriesProductPriceContainer}>
+        <Text style={styles.groceriesProductPrice}>{item.price}</Text>
+        <TouchableOpacity style={styles.addButton}>
+          <Icon name="add" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderBanner = ({ item }) => (
+    <View style={styles.bannerItem}>
+      <Image source={item.image} style={styles.bannerImage} />
+      <View style={styles.bannerTextContainer}>
+        <Text style={styles.bannerTitle}>{item.title}</Text>
+        <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
+      </View>
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View>
+      {/* Logo + Địa điểm */}
+      <View style={{ alignItems: 'center', marginVertical: 10 }}>
+        <Image
+          source={defaultImage}
+          style={{ width: 40, height: 40, borderRadius: 20 }}
+        />
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+          <Icon name="location-pin" size={18} color="black" />
+          <Text style={{ fontSize: 16, fontWeight: '500', color: 'black' }}>Dhaka, Banassre</Text>
+        </View>
+      </View>
+
+      {/* Search bar */}
+      <View style={styles.searchBar}>
+        <Icon name="search" size={20} color="#999" style={{ marginRight: 8 }} />
+        <Text style={{ color: '#999', fontSize: 16 }}>Search Store</Text>
+      </View>
+
+      {/* Banner */}
+      <FlatList
+        data={bannerImages}
+        renderItem={renderBanner}
+        keyExtractor={(item) => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        pagingEnabled
+        style={{ marginTop: 15 }}
+      />
+
+      {/* Exclusive Offer */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Exclusive Offer</Text>
+        <TouchableOpacity><Text style={styles.seeAll}>See all</Text></TouchableOpacity>
+      </View>
+      <FlatList
+        data={products}
+        renderItem={renderProduct}
+        keyExtractor={(item) => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.productList}
+      />
+
+      {/* Best Selling */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Best Selling</Text>
+        <TouchableOpacity><Text style={styles.seeAll}>See all</Text></TouchableOpacity>
+      </View>
+      <FlatList
+        data={products}
+        renderItem={renderProduct}
+        keyExtractor={(item) => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.productList}
+      />
+
+      {/* Groceries */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Groceries</Text>
+        <TouchableOpacity><Text style={styles.seeAll}>See all</Text></TouchableOpacity>
+      </View>
+      <FlatList
+        data={groceriesCategories}
+        renderItem={renderGroceriesCategory}
+        keyExtractor={(item) => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.groceriesCategoryList}
+      />
+    </View>
+  );
 
   return (
-    <View style={styles.container}>
-
-      {/* Header */}
-      <View style={styles.header}>
-        <Image source={{ uri: 'https://via.placeholder.com/80' }} style={styles.avatar} />
-        <View style={styles.locationContainer}>
-          <Text style={styles.locationLabel}>Your Location</Text>
-          <View style={styles.locationRow}>
-            <Ionicons name="location-outline" size={16} color="#6200EE" />
-            <Text style={styles.location}>{errorMsg || address}</Text>
-          </View>
-        </View>
-        <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={24} color="#000000" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput style={styles.searchBar} placeholder="Search your food" placeholderTextColor="#888" />
-        <Ionicons name="filter" size={24} color="#6200EE" style={styles.filterIcon} />
-      </View>
-
-      {/* Categories */}
+    <SafeAreaView style={styles.container}>
       <FlatList
-        horizontal
-        data={categories}
+        data={groceriesProducts}
+        renderItem={renderGroceriesProduct}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => setSelectedCategory(item.id)}
-            style={[
-              styles.categoryItem,
-              { backgroundColor: selectedCategory === item.id ? '#E8F5E9' : '#FFFFFF', width: CATEGORY_WIDTH },
-            ]}
-          >
-            <Ionicons name={item.icon} size={50} color="#000000" />
-            <Text style={styles.categoryText}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryList}
+        numColumns={2}
+        ListHeaderComponent={renderHeader}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.groceriesProductList}
       />
-
-      {/* Banner Giảm Giá */}
-      <View style={styles.banner}>
-        <View style={styles.bannerTextContainer}>
-          <Text style={styles.bannerTitle}>BURGER</Text>
-          <Text style={styles.bannerSubtitle}>Today's Hot Offer</Text>
-          <Text style={styles.bannerRating}>4.9 (3+ Rating)</Text>
-        </View>
-        <Image
-          source={{ uri: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60' }}
-          style={styles.bannerImage}
-        />
-        <View style={styles.discountBadge}>
-          <Text style={styles.discountText}>10% OFF</Text>
-        </View>
-      </View>
-
-      {/* Popular Items */}
-      <View style={styles.popularHeader}>
-        <Text style={styles.sectionTitle}>Popular Items</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewAll}>View All</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        horizontal
-        data={popularItems}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.popularItem}>
-            <Image source={{ uri: item.image }} style={styles.popularImage} />
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemPrice}>{item.price}</Text>
-          </View>
-        )}
-        showsHorizontalScrollIndicator={false}
-      />
-      
-    </View>
+    </SafeAreaView>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
-  container:
-   { flex: 1, backgroundColor: '#FFFFFF' },
-
-  header:
-   { flexDirection: 'row', alignItems: 'center', padding: 16 },
-
-  avatar: 
-   { width: 40, height: 40, borderRadius: 20, marginRight: 12 },
-
-  locationContainer: 
-   { flex: 1 },
-
-  locationLabel:
-   { fontSize: 12, color: '#888' },
-
-  locationRow:
-   { flexDirection: 'row', alignItems: 'center' },
-
-  location:
-   { fontSize: 14, fontWeight: 'bold', color: '#000', marginLeft: 4 },
-
-  searchContainer:
-   { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginVertical: 16 },
-
-  searchBar:
-   { flex: 1, backgroundColor: '#F0F0F0', borderRadius: 8, padding: 10, color: '#000000' },
-
-  filterIcon:
-   { marginLeft: 10 },
-
-  categoryList:
-   { paddingHorizontal: 16 },
-
-  categoryItem:
-   { alignItems: 'center', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: '#E0E0E0' },
-
-  categoryText:
-   { marginTop: 8, color: '#000000', fontSize: 14 },
-
-  banner:
-   { flexDirection: 'row', backgroundColor: '#000000', borderRadius: 8, margin: 16, padding: 16, alignItems: 'center' },
-
-  bannerTextContainer:
-   { flex: 1 },
-
-  bannerTitle:
-   { fontSize: 24, fontWeight: 'bold', color: '#FFC107' },
-
-  bannerSubtitle:
-   { fontSize: 14, color: '#FFFFFF', marginVertical: 4 },
-
-  bannerRating:
-   { fontSize: 14, color: '#FFFFFF' },
-
-  bannerImage:
-   { width: 100, height: 100, borderRadius: 8 },
-
-  discountBadge:
-   { position: 'absolute', top: 10, right: 10, backgroundColor: '#6200EE', borderRadius: 20, padding: 8 },
-
-  discountText:
-   { color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' },
-
-  popularHeader:
-   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 16, marginVertical: 8 },
-
-  sectionTitle:
-   { fontSize: 20, fontWeight: 'bold', color: '#000000' },
-
-  viewAll:
-   { fontSize: 14, color: '#6200EE' },
-
-  popularItem:
-   { marginRight: 16 },
-
-  popularImage:
-   { width: 150, height: 150, borderRadius: 8 },
-
-  itemName:
-   { fontSize: 16, fontWeight: 'bold', color: '#000000', marginTop: 8 },
-
-  itemPrice:
-   { fontSize: 14, color: '#888' },
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  searchBar: {
+    marginHorizontal: 15,
+    backgroundColor: '#F0F0F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  seeAll: {
+    fontSize: 16,
+    color: '#2ECC71',
+  },
+  productList: {
+    paddingHorizontal: 10,
+  },
+  productCard: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 10,
+    width: 150,
+    alignItems: 'center',
+  },
+  productImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginVertical: 5,
+  },
+  productPrice: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  addButton: {
+    backgroundColor: '#2ECC71',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 5,
+  },
+  groceriesCategoryList: {
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  groceriesCategoryCard: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 10,
+    alignItems: 'center',
+    width: 150,
+  },
+  groceriesCategoryImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  groceriesCategoryName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  groceriesProductList: {
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+  },
+  groceriesProductCard: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    margin: 5,
+    alignItems: 'center',
+  },
+  groceriesProductImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  groceriesProductName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginVertical: 5,
+    textAlign: 'center',
+  },
+  groceriesProductWeight: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  groceriesProductPriceContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginTop: 5,
+  },
+  groceriesProductPrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  bannerItem: {
+    width: width - 30,
+    marginLeft: 15,
+    marginRight: 15,
+    position: 'relative',
+  },
+  bannerImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 10,
+  },
+  bannerTextContainer: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+  },
+  bannerTitle: {
+    color: 'black',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  bannerSubtitle: {
+    color: 'green',
+    fontSize: 16,
+    marginTop: 5,
+  },
 });
 
 export default HomeScreen;
